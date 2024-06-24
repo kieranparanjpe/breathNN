@@ -1,12 +1,9 @@
-import math
 import cv2
-from new_set import cnnB
-from new_set import predictB
+import cnnProd as cnn
+import predict
 import numpy as np
 import pyaudio
 import time
-import wave
-import csv
 import torchaudio
 import torch
 from collections import deque
@@ -17,6 +14,7 @@ SAMPLE_RATE = 16000
 NUM_SAMPLES = 4000
 SAMPLE_STEP_SIZE = 480
 INPUT_DEVICE = 1
+LOAD_NETWORK = "feedforwardnet1719038075.pth"
 
 mel_spectrogram = torchaudio.transforms.MelSpectrogram(
     sample_rate=SAMPLE_RATE,
@@ -75,14 +73,14 @@ class Microphone:
 
 
 if __name__ == '__main__':
-    cnn = cnnB.CNNNetwork()
-    state_dict = torch.load("new_set\\networks\\feedforwardnet1719038075.pth")
+    cnn = cnn.CNNNetwork()
+    state_dict = torch.load(f"../networks/{LOAD_NETWORK}")
     cnn.load_state_dict(state_dict)
 
     microphone = Microphone()
     microphone.start()
 
-    last_stable_prediction = "other"
+    last_stable_prediction = ("other", 0)
     prediction_buffer = deque()
     prediction_buffer.append(last_stable_prediction)
 
@@ -94,19 +92,18 @@ if __name__ == '__main__':
             spectrogram.unsqueeze_(0)
             spectrogram.unsqueeze_(0)
 
-            prediction, expected = predictB.predict(cnn, spectrogram, 0,
-                                          predictB.class_mapping)
+            prediction, certainty = predict.predict(cnn, spectrogram)
 
-            prediction_text = last_stable_prediction
+            prediction_text = f"{last_stable_prediction[0]} {certainty.item():.2f}"
 
-            if prediction_buffer[0] != prediction:
+            if prediction_buffer[0][0] != prediction:
                 prediction_buffer.clear()
 
-            prediction_buffer.append(prediction)
+            prediction_buffer.append((prediction, certainty))
 
             if len(prediction_buffer) > 3:
-                last_stable_prediction = prediction
-                prediction_text = prediction
+                last_stable_prediction = prediction, certainty
+                prediction_text = f"{prediction} {certainty.item():.2f}"
 
             font = cv2.FONT_HERSHEY_SIMPLEX
             font_scale = 1

@@ -30,6 +30,8 @@ class BreathSet2(Dataset):
         self.target_dimension_2 = 0
         self.remove_from_set = remove_from_set
 
+        self.cutoff_point = cutoff_point
+
         self.files = os.listdir(self.audio_dir)
         self.num_audio_files = len(
             [item for item in self.files if os.path.isfile(os.path.join(self.audio_dir, item))]) / 2
@@ -48,6 +50,7 @@ class BreathSet2(Dataset):
                 _signal = _signal.to(self.device)
                 _signal = self._resample_if_necessary(_signal, sr)
                 _signal = self._mix_down_if_necessary(_signal)
+                _signal = tF.pad(_signal, (0, self.target_sample_rate * self.clipLength - _signal.shape[1]))
                 self.audio_files_in_ram[audio_file] = _signal
 
                 annotations = pd.read_csv(csv_file, header=None)
@@ -97,6 +100,7 @@ class BreathSet2(Dataset):
             _signal = _signal.to(self.device)
             _signal = self._resample_if_necessary(_signal, sr)
             _signal = self._mix_down_if_necessary(_signal)
+            _signal = tF.pad(_signal, (0, self.target_sample_rate * self.clipLength - _signal.shape[1]))
 
         _signal = self._refine_range(_signal, index)
 
@@ -104,6 +108,9 @@ class BreathSet2(Dataset):
 
         if self.transformation is not None:
             _signal = self.transformation(_signal)
+            if self.cutoff_point != 0:
+                cutoff_index = int((2 * self.cutoff_point / self.target_sample_rate) * _signal.shape[1])
+                _signal[0, 0:cutoff_index, :] = 0
         if index == 0:
             self.target_dimension_2 = _signal.shape[2]
         if _signal.shape[2] != self.target_dimension_2:
@@ -173,9 +180,9 @@ if __name__ == "__main__":
         device = "cpu"
     print(f"Using device {device}")
 
-    AUDIO_DIRECTORY = "..\\breathingSet2\\audioMyAnnotations\\"
+    AUDIO_DIRECTORY = "../datasets/breathingSet2/audioMyAnnotations"
     TARGET_SAMPLE_RATE = 16000
-    NUM_SAMPLES = 4000
+    NUM_SAMPLES = 1000
     SAMPLE_STEP = 480
 
     mel_spectrogram = torchaudio.transforms.MelSpectrogram(
@@ -185,7 +192,12 @@ if __name__ == "__main__":
         n_mels=64
     )
 
-    bs2 = BreathSet2(AUDIO_DIRECTORY, TARGET_SAMPLE_RATE, NUM_SAMPLES, SAMPLE_STEP, transformation=mel_spectrogram,
+    spectrogram = torchaudio.transforms.Spectrogram(
+        n_fft=512,
+        hop_length=128
+    )
+
+    bs2 = BreathSet2(AUDIO_DIRECTORY, TARGET_SAMPLE_RATE, NUM_SAMPLES, SAMPLE_STEP, transformation=spectrogram,
                      _device=device, load_in_ram=True, max_silence=10000, remove_from_set=0)
 
     print(f"There are {len(bs2)} samples in the dataset.")

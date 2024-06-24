@@ -83,7 +83,7 @@ def train(model, data_loader, loss_fn, optimiser, device, epochs):
             predict_accuracy = 100 * correct / total
             print(f"Accuracy: {100 * correct / total}")
 
-        write_file("C:\\Users\\kiera\\Documents\\verse\\breathNN\\stats.csv",
+        write_file("C:\\Users\\kiera\\Documents\\verse\\breathNN\\output.csv",
                    [i, stat, loss, predict_accuracy] if predict_accuracy != 0 else [i, stat, loss])
         print("---------------------------")
     print("Finished training")
