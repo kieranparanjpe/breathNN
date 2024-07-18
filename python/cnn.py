@@ -43,7 +43,7 @@ class CNNNetwork(nn.Module):
         self.conv4 = nn.Sequential(
             nn.Conv2d(
                 in_channels=64,
-                out_channels=128,
+                out_channels=64,
                 kernel_size=3,
                 stride=1,
                 padding=2
@@ -64,7 +64,8 @@ class CNNNetwork(nn.Module):
         )
         self.flatten = nn.Flatten()
 
-        self.linear = nn.Linear(4352, num_outputs)  #if you change sampling size, will get error. in features needs to be new number in error.
+        # 1600 for 8000
+        self.linear = nn.Linear(1600, num_outputs)  #if you change sampling size, will get error. in features needs to be new number in error.
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, input_data):
@@ -81,4 +82,4 @@ class CNNNetwork(nn.Module):
 
 if __name__ == "__main__":
     cnn = CNNNetwork()
-    summary(cnn.cuda(), (1, 256, 8))
+    summary(cnn.cuda(), (1, 64, 64))

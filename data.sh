@@ -18,3 +18,6 @@ for file in $textFiles; do
     echo "" >> annotations.csv
     # cat $file >> annotations.txt
 done
+
+
+# for downloading from gsutil: gsutil cp -r gs://verse-audio-collection.appspot.com "C:\Users\kiera\Documents\verse\breathNN\datasets"

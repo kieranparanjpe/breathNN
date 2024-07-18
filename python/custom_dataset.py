@@ -11,6 +11,10 @@ import torch.nn.functional as tF
 from tqdm import tqdm
 
 
+# idea: loop through all wav files and add their samples to one array, then cut that array into one pretdetermined size and save the new wav files
+# -> essentially take a number of wave files, combine into one file, then separate into new files again.
+
+
 class BreathSet2(Dataset):
 
     def __init__(self, audio_dir, target_sample_rate, num_samples, sample_step,
@@ -52,7 +56,6 @@ class BreathSet2(Dataset):
                 _signal = self._mix_down_if_necessary(_signal)
                 _signal = tF.pad(_signal, (0, self.target_sample_rate * self.clipLength - _signal.shape[1]))
                 self.audio_files_in_ram[audio_file] = _signal
-
                 annotations = pd.read_csv(csv_file, header=None)
                 annotations_arr = annotations.to_numpy().flatten()
                 if annotations_arr[len(annotations_arr) - 1] == 0:
@@ -182,8 +185,8 @@ if __name__ == "__main__":
 
     AUDIO_DIRECTORY = "../datasets/breathingSet2/audioMyAnnotations"
     TARGET_SAMPLE_RATE = 16000
-    NUM_SAMPLES = 1000
-    SAMPLE_STEP = 480
+    NUM_SAMPLES = 4000
+    SAMPLE_STEP = 500
 
     mel_spectrogram = torchaudio.transforms.MelSpectrogram(
         sample_rate=TARGET_SAMPLE_RATE,

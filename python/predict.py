@@ -10,13 +10,15 @@ if __name__ == "__main__":
 class_mapping = [
     "inhale",
     "exhale",
-    "other",
+    "silence",
+    "speech",
+    "keyboard"
 ]
 
 LOAD_NETWORK = "feedforwardnet1719045554.pth"
 
 
-def predict(model, _input, _target=None, _class_mapping=None):
+def predict(model, _input, _target=None, _class_mapping=None, threshold=0):
     if _class_mapping is None:
         _class_mapping = class_mapping
 
@@ -26,7 +28,10 @@ def predict(model, _input, _target=None, _class_mapping=None):
         predictions = model(_input)
         predicted_index = predictions[0].argmax(0)
         certainty = predictions[0][predicted_index]
-        p = _class_mapping[predicted_index]
+        if certainty > threshold:
+            p = _class_mapping[predicted_index]
+        else:
+            p = None
         if _target is not None:
             e = _class_mapping[_target]
     if _target is not None:

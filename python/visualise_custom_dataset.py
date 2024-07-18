@@ -14,7 +14,7 @@ import cv2
 TARGET_SAMPLE_RATE = 16000
 CLIP_LENGTH = 60
 NUM_SAMPLES = TARGET_SAMPLE_RATE * CLIP_LENGTH
-AUDIO_DIRECTORY = "..\\datasets\\breathingSet2\\audioMyAnnotations"
+AUDIO_DIRECTORY = "..\\datasets\\breathingSet2\\cleanAudio"
 
 
 def _resample_if_necessary(_signal, sr):
@@ -64,12 +64,12 @@ if __name__ == "__main__":
         hop_length=512
     ).to(device)
 
-    for i in range(0, 19):
+    for i in range(0, 45):
         INDEX = i
-
         audio_name, audio_label = _get_paths(INDEX)
+        print(f"{INDEX}: {audio_name}")
         _signal, sr = torchaudio.load(audio_name)
-
+        CLIP_LENGTH = _signal.shape[1] / sr
         _signal = _signal.to(device)
         _signal = _resample_if_necessary(_signal, sr)
         _signal = _refine_range(_signal, INDEX)
@@ -92,9 +92,10 @@ if __name__ == "__main__":
         for row in annotations.iterrows():
             for index, point in enumerate(row[1]):
                 x_coord = math.floor((int(point) / (CLIP_LENGTH * 1000)) * width)
-                _spectrogram_with_labels[0, :, x_coord - 1:x_coord + 1] = 60 * (index % 2)
+                i = index % 4
+                _spectrogram_with_labels[0, :, x_coord:x_coord + 1 + i] = 60 * i/4
 
-        show_labels = False
+        show_labels = True
         while True:
             img = _spectrogram_signal.cpu()[0].numpy() if not show_labels else _spectrogram_with_labels.cpu()[0].numpy()
 
