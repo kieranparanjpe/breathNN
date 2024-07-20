@@ -2,6 +2,10 @@ import torch
 import torchaudio
 from tqdm import tqdm
 
+'''
+purpose of file: do predictions on model.
+'''
+
 if __name__ == "__main__":
     from cnn import CNNNetwork
     from custom_dataset import BreathSet2

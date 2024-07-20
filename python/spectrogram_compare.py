@@ -7,6 +7,10 @@ import cv2
 from scipy.fft import fft
 import pandas as pd
 
+'''
+I used this script to better understand torchaudio mel spectrogram, contains my np version of mel spectrogram. basically just used for c# translation.
+'''
+
 N_FFT = 2048
 HOP_LEN = 128
 SAMPLE_RATE = 48000

@@ -7,6 +7,11 @@ import torchaudio
 import torch
 import cv2
 
+'''
+script is to double check that the test and train cached sets are actually different
+I got higher than expected results once and needed to check
+'''
+
 train_set = CachedDataSetReader(cache_dir="../datasets/cache", cache_postfix="mel_8000_1000_train")
 test_set = CachedDataSetReader(cache_dir="../datasets/cache", cache_postfix="mel_8000_1000_test")
 

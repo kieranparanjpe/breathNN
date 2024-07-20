@@ -1,7 +1,10 @@
 from torch import nn
 from torchsummary import summary
 
-
+'''
+duplicate of cnn
+used if you want to version of cnn for different models, not using rn
+'''
 class CNNNetwork(nn.Module):
 
     def __init__(self, num_outputs=3):

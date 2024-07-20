@@ -15,12 +15,43 @@ from tqdm import tqdm
 import time
 import cv2
 
+'''
+nightmare nightmare nightmare
+current dataloader its horrible so bad so bad
+
+workflow:
+
+dataset is found in two places:
+datasets/other_sounds
+datasets/breathset2
+
+breathset1 is for old stuff
+breathset3 has some files from youtube, but ultimately it gets put into bs2
+
+other_sounds is easier and more organised. Number in the folder corresponds to the index of prediction (can be found in predict.py, class mapping)
+/dirty/ -> just the raw file of whatever sound. you can clean by taking out silence and other sounds
+/train/ -> the train set, will be populated when preprocess is run
+/test/ -> the test set, will be populated when preprocess is run
+
+breathSet2 contains a number of folders. 
+/audio/ -> where you should put audio that has been downloaded from firebase. 
+/temp/ often when I am doing annotations on new data, I put them into this folder instead of doing it from audio, just cuz its easier
+/audioMyAnnotations/ and /auduoMyAnnotations so far/ -> used to use, not anymore
+/dirtyAudio/ -> where audio files and annotations go when they have been cleaned and annotated 
+/cleanAudio/ -> where audio files go after being preprocessed
+/cleanAudioTest/ -> move some files from cleanAudio into here so there is a test set
+
+
+ALSO
+there is datasets/cache for the datasets that are ready to be loaded with train.py.
+
+'''
+
 # idea: loop through all wav files and add their samples to one array, then cut that array into one pretdetermined size and save the new wav files
 # -> essentially take a number of wave files, combine into one file, then separate into new files again.
 
 
-# i am doing this totally wrong : (
-# one chunk = one piece of data to feed into NN
+# this can do many many things, too many, some of them don't work. see bottom of file for usage
 class BreathSetReader(Dataset):
     def __init__(self, audio_dir, sample_rate, samples_per_chunk, chunk_step, transformation, target_clip_length=60,
                  _device="cpu", set_range=(0, -1), cutoff_point=0, other_sets_dir="",
@@ -463,18 +494,24 @@ if __name__ == '__main__':
         hop_length=128
     )
 
+    # when you add new breath audio data that has been annotated, you need to uncomment this and run it. it will take the audio from
+    # raw_dir and condense it and put it into cleanAudio. Relevant settins are target_clip_length, which will make the clean audio clips this length in seconds.
     ''' BreathSetReader("../datasets/breathingSet2/cleanAudio", 16000, 8000, 1000, mel_spectrogram,
                                   target_clip_length=3 * 60, raw_dir="../datasets/breathingSet2/dirtyAudio", _device=device,
                                   load_in_ram=False, preprocess=True, other_sets_dir="../datasets/other_sounds/test",
                                   save_to_cache=False, cache_dir="../datasets/cache", cache_postfix="mel_8000_1000_test")'''
     dont_save = set()
+    # this preprocesses the 'other' sounds, uncomment and run when there is new 'other' sounds.
     # preprocess_other("../datasets/other_sounds/dirty", "../datasets/other_sounds/test", _device=device, max_length_s=150, do_not_save=dont_save)
 
+    #any time you want to generate a new cached dataset, run this. this is when sample rate, samples per chunk, chunk step and mel_spectrogtam matter.
+    # do not run thi sand the initial preprocess (two functions up) in the same run because you need to go in by hand and put some files from /networks/breathSet2/cleanAudio into /networks/breathSet2/cleanAudioTest
     BreathSetReader("../datasets/breathingSet2/cleanAudioTest", 16000, 4096, 1000, mel_spectrogram,
                               target_clip_length=3 * 60, raw_dir="../datasets/breathingSet2/dirtyAudio", _device=device,
                               load_in_ram=True, preprocess=False, other_sets_dir="../datasets/other_sounds/test",
                               save_to_cache=True, cache_dir="../datasets/cache", cache_postfix="mel_4096_1000_test")
 
+    # do above again but for the test set:
     # preprocess_other("../datasets/other_sounds/dirty", "../datasets/other_sounds/train", _device=device, max_length_s=1000, do_not_save=dont_save)
 
     BreathSetReader("../datasets/breathingSet2/cleanAudio", 16000, 4096, 1000, mel_spectrogram,
@@ -482,6 +519,8 @@ if __name__ == '__main__':
                               load_in_ram=True, preprocess=False, other_sets_dir="../datasets/other_sounds/train",
                               save_to_cache=True, cache_dir="../datasets/cache", cache_postfix="mel_4096_1000_train") # 4096 uses a different mel_spectrogram, where n_fft=samplesperchunk=4096
 
+
+    # this is just old i think:
     '''dataset = BreathSetReader("../datasets/breathingSet2/cleanAudioTest", 16000, 4000, 500, mel_spectrogram,
                               target_clip_length=3 * 60, raw_dir="../datasets/breathingSet2/dirtyAudio", _device=device,
                               load_in_ram=True, preprocess=False,

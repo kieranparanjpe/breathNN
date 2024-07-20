@@ -7,6 +7,10 @@ import torchaudio
 import torch
 import cv2
 
+'''
+this was used to compare 2 dataloads, just to sanity check they were doing the same thing
+'''
+
 AUDIO_DIR = "../datasets/breathingSet2/cleanAudio"
 SAMPLE_RATE = 16000
 SAMPLES_PER_CHUNK = 2000

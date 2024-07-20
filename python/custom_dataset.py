@@ -11,6 +11,10 @@ import torch.nn.functional as tF
 from tqdm import tqdm
 
 
+'''
+old dataloader. nightmare script #2
+'''
+
 # idea: loop through all wav files and add their samples to one array, then cut that array into one pretdetermined size and save the new wav files
 # -> essentially take a number of wave files, combine into one file, then separate into new files again.
 

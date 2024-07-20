@@ -1,6 +1,10 @@
 import torch
 import cnn
 
+'''
+okay easy script for once, just convert a model to onnx so it can be used in unity.
+'''
+
 file_in = "feedforwardnet234.pth"
 file_out = "test_0_8000.onnx"
 

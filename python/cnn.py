@@ -1,7 +1,9 @@
 from torch import nn
 from torchsummary import summary
 
-
+'''
+the actual NN. copied from YT tutorial pretty much, nothing crazy here. just remember that when changing input sizes will need to change final layer input size.
+'''
 class CNNNetwork(nn.Module):
 
     def __init__(self, num_outputs=3):

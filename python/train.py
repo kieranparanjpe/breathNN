@@ -16,32 +16,51 @@ if __name__ == '__main__':
     from custom_dataset import BreathSet2
     import predict
 
+'''
+this is nightmare file #1, and its not the worst one.
+used to train a model
+
+During training, this script will save every third epoch to a networks/temp (gets overwritten each run)
+Will also write debug stats to output/ as csv files. Header for csv: iteration, accuracy, breath accuracy, loss, test accuracy, test breath accuracy
+Breath accuracy counts guessing an inhale as an exhale and vise versa as correct (basically could it tell breath from non breath)
+When it finishes training all epochs, will write the model to networks/ and will show plot of data (no legends on it, but basically always breath accuracy > accuracy > test breath accuracy > test accuracy
+'''
+
+# can be used to continue training a previously trained model.
 LOAD_NETWORK = ""
+
+#directory to look in for training set / test set -> NOT IN USE RN
 AUDIO_DIR_TRAIN = "../datasets/breathingSet2/cleanAudio"
 AUDIO_DIR_TEST = "../datasets/breathingSet2/cleanAudioTest"
 TIME = int(time.time())
+# amount to train
 EPOCHS = 251
-
+# ok this is pretty standard
 BATCH_SIZE = 32
 LEARNING_RATE = 0.0001
+
+#audio settings
 SAMPLE_RATE = 16000
 NUM_SAMPLES = 4000
 SAMPLE_STEP = 250
+# if you want to add more classifications to increase accuracy, this is easy way to change num outputs in model
 NUM_OUTPUTS = 5
 
 
+# this was just my old to do list, but im keeping it here
 # things to try: reduce complexity and mess around with num samples and sample step
 # look at: https://www.youtube.com/watch?v=uCGROOUO_wY
 # also confusion matrix
 # get other datasets!
 
-
+# write to csv file
 def write_file(name, row):
     with open(name, 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(row)
 
 
+# trains a single epoch and collects a bunch of info abt it
 def train_single_epoch(model, data_loader, _loss_fn, _optimiser, _device):
     correct = 0
     correct_breath = 0
@@ -83,7 +102,7 @@ def train_single_epoch(model, data_loader, _loss_fn, _optimiser, _device):
     print(f"confusion: \n{100 * confusion_matrix / total}")
     return loss_sum / total, 100 * correct / total, 100 * correct_breath / total
 
-
+# train all epochs and collect stats abt it. each 3 epochs it will test on the test set.
 def train(model, data_loader, _loss_fn, _optimiser, _device, epochs):
     predict_accuracy = 0
     predict_breath_accuracy = 0
@@ -165,6 +184,13 @@ if __name__ == "__main__":
         n_fft=512,
         hop_length=128
     )
+
+    '''
+    DATALOADING:
+    dataloading has changed a bunch over time,
+    rn im saving the entire dataset as a torch tensor on disk, and whole thing into ram, faster this way, using cashed data set reader.
+    Prev was using the stuff commented out below, basically loads it from the disk each time, or loads into ram depending on params, but still slower.
+    '''
 
 
     '''train_set = BreathSet2(AUDIO_DIR_TRAIN, SAMPLE_RATE, NUM_SAMPLES, SAMPLE_STEP, transformation=spectrogram,
