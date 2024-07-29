@@ -67,7 +67,7 @@ class CNNNetwork(nn.Module):
         self.flatten = nn.Flatten()
 
         # 1600 for 8000
-        self.linear = nn.Linear(1600, num_outputs)  #if you change sampling size, will get error. in features needs to be new number in error.
+        self.linear = nn.Linear(960, num_outputs)  #if you change sampling size, will get error. in features needs to be new number in error.
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, input_data):

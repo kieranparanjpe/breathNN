@@ -489,12 +489,20 @@ if __name__ == '__main__':
         n_mels=64
     )
 
+    # this is spectrogram settings for non 4096:
+    '''mel_spectrogram = torchaudio.transforms.MelSpectrogram(
+        sample_rate=SAMPLE_RATE,
+        n_fft=2048,
+        hop_length=128,
+        n_mels=64
+    )'''
+
     spectrogram = torchaudio.transforms.Spectrogram(
         n_fft=512,
         hop_length=128
     )
 
-    # when you add new breath audio data that has been annotated, you need to uncomment this and run it. it will take the audio from
+    # 1) when you add new breath audio data that has been annotated, you need to uncomment this and run it. it will take the audio from
     # raw_dir and condense it and put it into cleanAudio. Relevant settins are target_clip_length, which will make the clean audio clips this length in seconds.
     ''' BreathSetReader("../datasets/breathingSet2/cleanAudio", 16000, 8000, 1000, mel_spectrogram,
                                   target_clip_length=3 * 60, raw_dir="../datasets/breathingSet2/dirtyAudio", _device=device,
@@ -502,17 +510,17 @@ if __name__ == '__main__':
                                   save_to_cache=False, cache_dir="../datasets/cache", cache_postfix="mel_8000_1000_test")'''
     dont_save = set()
     # this preprocesses the 'other' sounds, uncomment and run when there is new 'other' sounds.
-    # preprocess_other("../datasets/other_sounds/dirty", "../datasets/other_sounds/test", _device=device, max_length_s=150, do_not_save=dont_save)
+    # 1.5) preprocess_other("../datasets/other_sounds/dirty", "../datasets/other_sounds/test", _device=device, max_length_s=150, do_not_save=dont_save)
 
-    #any time you want to generate a new cached dataset, run this. this is when sample rate, samples per chunk, chunk step and mel_spectrogtam matter.
+    #2) any time you want to generate a new cached dataset, run this. this is when sample rate, samples per chunk, chunk step and mel_spectrogtam matter.
     # do not run thi sand the initial preprocess (two functions up) in the same run because you need to go in by hand and put some files from /networks/breathSet2/cleanAudio into /networks/breathSet2/cleanAudioTest
     BreathSetReader("../datasets/breathingSet2/cleanAudioTest", 16000, 4096, 1000, mel_spectrogram,
                               target_clip_length=3 * 60, raw_dir="../datasets/breathingSet2/dirtyAudio", _device=device,
                               load_in_ram=True, preprocess=False, other_sets_dir="../datasets/other_sounds/test",
                               save_to_cache=True, cache_dir="../datasets/cache", cache_postfix="mel_4096_1000_test")
 
-    # do above again but for the test set:
-    # preprocess_other("../datasets/other_sounds/dirty", "../datasets/other_sounds/train", _device=device, max_length_s=1000, do_not_save=dont_save)
+    # 2) do above again but for the test set:
+    # 1.5) preprocess_other("../datasets/other_sounds/dirty", "../datasets/other_sounds/train", _device=device, max_length_s=1000, do_not_save=dont_save)
 
     BreathSetReader("../datasets/breathingSet2/cleanAudio", 16000, 4096, 1000, mel_spectrogram,
                               target_clip_length=3 * 60, raw_dir="../datasets/breathingSet2/dirtyAudio", _device=device,

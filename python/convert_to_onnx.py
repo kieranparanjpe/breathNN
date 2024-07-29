@@ -5,14 +5,14 @@ import cnn
 okay easy script for once, just convert a model to onnx so it can be used in unity.
 '''
 
-file_in = "feedforwardnet234.pth"
-file_out = "test_0_8000.onnx"
+file_in = "feedforwardnet153.pth"
+file_out = "test_0_4096.onnx"
 
 cnn = cnn.CNNNetwork(num_outputs=5)
 state_dict = torch.load(f"../networks/{file_in}")
 cnn.load_state_dict(state_dict)
 
-shape = (1, 1, 64, 63)
+shape = (1, 1, 64, 33)
 x = torch.randn(shape)
 
 torch.onnx.export(cnn,  # model being run

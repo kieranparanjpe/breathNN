@@ -209,6 +209,7 @@ if __name__ == "__main__":
     train_set = CachedDataSetReader(cache_dir="../datasets/cache", cache_postfix="mel_4096_1000_train", max_dist=(8500, 8500, 8500, 8500, 8500))
     test_set = CachedDataSetReader(cache_dir="../datasets/cache", cache_postfix="mel_4096_1000_test")
 
+
     train_dataloader = DataLoader(train_set, shuffle=True, batch_size=BATCH_SIZE)
     # construct model and assign it to device
     cnn = CNNNetwork(num_outputs=5).to(device)

@@ -18,16 +18,16 @@ Test out a model in realtime
 FORMAT = pyaudio.paFloat32
 CHANNELS = 1
 SAMPLE_RATE = 16000
-NUM_SAMPLES = 8000
-SAMPLE_STEP_SIZE = 250
+NUM_SAMPLES = 4096
+SAMPLE_STEP_SIZE = 500
 BUFFER_SIZE = 4
 INPUT_DEVICE = 1
-LOAD_NETWORK = "feedforwardnet234.pth"
+LOAD_NETWORK = "feedforwardnet153.pth"
 frame_processed = False
 
 mel_spectrogram = torchaudio.transforms.MelSpectrogram(
     sample_rate=SAMPLE_RATE,
-    n_fft=2048,
+    n_fft=4096,
     hop_length=128,
     n_mels=64
 )
@@ -173,10 +173,9 @@ if __name__ == '__main__':
     print(f"Using {device}")
 
     # load network
-    cnn = cnn.CNNNetwork(num_outputs=5).to(device)
-    state_dict = torch.load(f"../networks/{LOAD_NETWORK}", map_location=torch.device(device))
+    cnn = cnn.CNNNetwork(num_outputs=5)
+    state_dict = torch.load(f"../networks/{LOAD_NETWORK}")
     cnn.load_state_dict(state_dict)
-    cnn = cnn.to(device)
 
     microphone = Microphone()
     microphone.start()
